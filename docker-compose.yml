@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  postgres-master:
+    image: local/postgres
+    hostname: postgres-master
+    build: postgres
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD:
+      POSTGRES_REG_USER: exampleuser
+      POSTGRES_REG_DB: exampledb
+      POSTGRES_REG_USER_PASS:
+      POSTGRES_REPLICATION_USER: replication_user
+      POSTGRES_REPLICATION_PASS:
+    restart: always
+    volumes:
+      - postgres-master:/var/lib/postgresql
+
+  postgres-slave:
+    image: local/postgres
+    hostname: postgres-slave
+    build: postgres
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD:
+      POSTGRES_MASTER: postgres-master
+      POSTGRES_REPLICATION_USER: replication_user
+      POSTGRES_REPLICATION_PASS:
+    depends_on:
+      - postgres-master
+    restart: always
+    volumes:
+      - postgres-slave:/var/lib/postgresql
+
+volumes:
+  postgres-master:
+  postgres-slave:
