@@ -1,4 +1,5 @@
 #!/bin/sh
+source /usr/local/bin/docker-entrypoint.sh
 
 set -e
 
@@ -24,8 +25,6 @@ EOF
 
 fi
 
-
-
 if [ ! -z "$POSTGRES_MASTER" ]; then
 
     echo "Container designated as replica."
@@ -36,6 +35,11 @@ if [ ! -z "$POSTGRES_MASTER" ]; then
         sleep 2
     done
 
-    pg_basebackup -h $POSTGRES_MASTER -U $POSTGRES_REPLICATION_USER -D /var/lib/postgresql/data/  -Fp -Xs -P -R
+    docker_temp_server_stop
+
+    rm -Rf /var/lib/postgresql/data/*
+    PGPASSWORD=$POSTGRES_REPLICATION_PASS pg_basebackup -h $POSTGRES_MASTER -U $POSTGRES_REPLICATION_USER -D /var/lib/postgresql/data/  -Fp -Xs -P -R
+    docker_temp_server_start
+
 
 fi
