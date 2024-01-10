@@ -37,8 +37,10 @@ if [ ! -z "$POSTGRES_MASTER" ]; then
 
     docker_temp_server_stop
 
+    echo "Copying master data to replica"
     rm -Rf /var/lib/postgresql/data/*
     PGPASSWORD=$POSTGRES_REPLICATION_PASS pg_basebackup -h $POSTGRES_MASTER -U $POSTGRES_REPLICATION_USER -D /var/lib/postgresql/data/  -Fp -Xs -P -R
+
     docker_temp_server_start
 
 
